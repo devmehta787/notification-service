@@ -1,10 +1,12 @@
 import express from 'express';
+import cors from 'cors';
 import { EmailService } from './app/email.service';
 
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 const emailService = new EmailService();
@@ -29,7 +31,7 @@ app.post('/send-email', async (req, res) => {
   const { to, subject, text, maxRetry, retryDelay} = req.body;
   try {
     const response = await emailService.sendEmail(to, subject, text, maxRetry, retryDelay);
-    res.status(200).send(response);
+    res.status(200).send("Mail sent successfully!!");
   } catch (error) {
     res.status(500).send('Failed to send email');
   }
