@@ -14,10 +14,21 @@ app.get('/', (req, res) => {
 });
 
 // route for email sending
+
+//SAMPLE REQUEST BODY
+
+// {
+//   "to": "devmehta787@gmail.com",
+//   "subject": "test email server",
+//   "text": "this is a test email from notification service.",
+//   "maxRetry": 2,
+//   "retryDelay": 2500
+// }
+
 app.post('/send-email', async (req, res) => {
-  const { to, subject, text } = req.body;
+  const { to, subject, text, maxRetry, retryDelay} = req.body;
   try {
-    const response = await emailService.sendEmail(to, subject, text);
+    const response = await emailService.sendEmail(to, subject, text, maxRetry, retryDelay);
     res.status(200).send(response);
   } catch (error) {
     res.status(500).send('Failed to send email');

@@ -2,8 +2,8 @@ import nodemailer from 'nodemailer';
 
 export class EmailService {
     private transporter;
-    private maxRetry: number;
-    private retryDelay: number;
+    // private maxRetry: number;
+    // private retryDelay: number;
 
     constructor() {
         this.transporter = nodemailer.createTransport({
@@ -13,15 +13,18 @@ export class EmailService {
                 pass: 'password@123',
             },
         });
-        this.maxRetry = 3;
-        this.retryDelay = 3000;
+        // this.maxRetry = 3;
+        // this.retryDelay = 3000;
     }
 
     private async delay(ms: number) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    async sendEmail(to: string, subject: string, text: string) {
+    async sendEmail(to: string, subject: string, text: string, maxRetry: number = 3, retryDelay: number = 3000) {
+        if (maxRetry > 10) {
+            throw new Error('max retries cannot exceed 10');
+        }
         const mailOptions = {
             from: 'abc@gmail.com',
             to: to,
@@ -30,7 +33,7 @@ export class EmailService {
         };
         
         let attempt = 0;
-        while (attempt < this.maxRetry) {    
+        while (attempt < maxRetry) {    
             
             try {
                 const info = await this.transporter.sendMail(mailOptions);
@@ -40,9 +43,9 @@ export class EmailService {
                 attempt++;
                 console.error(`attempt ${attempt} failed:`, error);
 
-                if (attempt < this.maxRetry) {
-                console.log(`retrying in ${this.retryDelay / 1000} seconds`);
-                await this.delay(this.retryDelay);
+                if (attempt < maxRetry) {
+                console.log(`retrying in ${retryDelay / 1000} seconds`);
+                await this.delay(retryDelay);
                 } else {
                 console.error('All retry attempts failed');
                 throw error;
